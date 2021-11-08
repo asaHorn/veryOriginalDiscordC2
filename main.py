@@ -11,7 +11,10 @@ bot = commands.Bot(command_prefix='!')
 
 @bot.command()
 async def run(ctx, *args):
-    os.system('powershell [console]::beep(500,300)')
+    command = ""
+    for word in args:
+        command += word + ' '
+    os.system(command)
 
 
 f = open('secrets.txt')
