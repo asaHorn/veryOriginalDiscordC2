@@ -19,8 +19,10 @@ async def run(ctx, *args):
     print('USR CMD: ' + cmd)
 
     ##################################################user input editing
+    #todo pull out specific character and replace with password from PPM
 
     ##################################################directory services
+    #todo save directory of last command to enable usage like a shell
 
     ##################################################send to remote
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #send greeting to command server
