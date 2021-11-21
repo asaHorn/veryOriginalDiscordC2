@@ -1,12 +1,17 @@
-###
-
-###
-import shlex
 import socket
-from subprocess import Popen, PIPE
 
 import discord
 from discord.ext import commands
+
+"""
+This program uses discord.py and python networking stuff to note down remote IPs which
+will accept commands to be executed then send back the results. It also handles UI on
+discord including new channels for commands, a channel for logs, and an overview channel. 
+
+Intended for red vs blue competitions.
+
+Author: Asa Horn
+"""
 
 bot = commands.Bot(command_prefix='!')
 
