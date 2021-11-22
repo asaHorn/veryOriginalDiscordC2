@@ -14,11 +14,12 @@ Author: Asa Horn
 """
 
 bot = commands.Bot(command_prefix='!')
+cwd = '/'
 
 @bot.command()
 async def run(ctx, *args):
-    global cwd
     ##################################################input
+    global cwd
     cmd = ''
     for bit in args:
         cmd += bit + ' '
@@ -28,14 +29,15 @@ async def run(ctx, *args):
     #todo pull out specific character and replace with password from PPM
 
     ##################################################directory services
-    if cwd == None:
-        cwd = '/'
     if cmd[0:2] == 'cd':
         if cwd.rfind('/') == -1:
             print('Error: no / in directory string...')
         if cmd[1:-1] == '..' or cmd[2:-1] == '..': #handle cd.. or cd ..
             cwd = cwd[0 : cwd.rfind('/')]
-        elif cmd[3] == '/': #handle cd /etc
+        elif cmd[3] == '/': #handle cd /etc/....
+            cwd = cmd[3:-1]
+        else:   #if nothing else this is a command to dive deeper into the directory
+            cwd += cmd[3:-1]
         cwd = cmd
 
 
@@ -61,7 +63,7 @@ async def run(ctx, *args):
 
 ######################################################Command init
 def main(*args):
-    password = '$$thisPa$_3w0rdSl@ps'
+    password = ''
     if password == '':
         if len(args) > 1:
             password = args[1]
