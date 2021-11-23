@@ -30,7 +30,8 @@ def get_ip():
 
 ###############################################################Main
 def main(*args):
-    controllerIP = '192.168.139.1'
+    controllerIP = ''
+    master
     password = ''
 
     if password == '':
@@ -65,7 +66,7 @@ def main(*args):
     ####### main loop
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:  #await instructions from server
-            s.bind((controllerIP, 22705))
+            s.bind(("", 22705))
             s.listen()
             conn, addr = s.accept()
             with conn:
