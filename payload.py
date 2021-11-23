@@ -30,7 +30,7 @@ def get_ip():
 
 ###############################################################Main
 def main(*args):
-    controllerIP = ''
+    controllerIP = '192.168.139.1'
     password = ''
 
     if password == '':

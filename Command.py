@@ -38,7 +38,6 @@ async def run(ctx, *args):
             cwd = cmd[3:-1]
         else:   #if nothing else this is a command to dive deeper into the directory
             cwd += cmd[3:-1]
-        cwd = cmd
 
 
     ##################################################send to remote
