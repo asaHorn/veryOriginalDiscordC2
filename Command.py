@@ -19,8 +19,8 @@ cwd = '/'
 
 @bot.command()
 async def run(ctx, *args):
-    global cwd
     ##################################################input
+    global cwd
     cmd = ''
     for bit in args:
         cmd += bit + ' '
@@ -80,7 +80,7 @@ async def run(ctx, *args):
 
 ######################################################Command init
 def main(*args):
-    password = 'testingPasswordPlzRemove'
+    password = ''
     if password == '':
         if len(args) > 1:
             password = args[1]
